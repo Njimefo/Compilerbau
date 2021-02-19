@@ -1,0 +1,4 @@
+proc add ( i: int, j : int) {
+
+}
+type main = int;

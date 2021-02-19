@@ -1,0 +1,10 @@
+proc modulo ( op1: int, op2: int, ref result: int) {
+result := op1 - op1 / op2 * op2;
+}
+
+proc main () {
+var i: int;
+i := 21;
+modulo(i, i-16, i);
+printi(i);
+}

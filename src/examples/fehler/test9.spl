@@ -1,0 +1,6 @@
+proc main(){}
+type i  =array[9] of int;
+proc add(a : int) {
+var i : i;
+
+}

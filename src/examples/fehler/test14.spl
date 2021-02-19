@@ -1,0 +1,10 @@
+type v = array [10] of int; 
+proc main () {
+	var i: int;
+    add(i , 3);
+}
+
+proc add(ref i: v, j :int) {
+
+}
+

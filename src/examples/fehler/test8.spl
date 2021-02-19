@@ -1,0 +1,15 @@
+
+type vector = array [10] of int;
+
+proc main(){
+
+var y : vector;
+
+
+var x : int;
+
+
+x:= y;
+
+
+}

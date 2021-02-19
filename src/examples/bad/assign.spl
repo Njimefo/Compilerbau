@@ -1,0 +1,7 @@
+type c = int;
+type b = int;
+proc a(i :int, v : int) {}
+
+proc main (i : int) {
+ var i: int;
+}

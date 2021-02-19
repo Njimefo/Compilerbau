@@ -1,0 +1,16 @@
+type some = array [29] of array [98]of int;
+
+proc add( a : int , b : int) {
+ a := 9 + 4;
+ b := 10;
+}
+
+
+proc main(){
+    var c : int;
+    var a : some;
+    var d : int;
+    a[9][2] := 3;
+   add( c , d);
+}
+

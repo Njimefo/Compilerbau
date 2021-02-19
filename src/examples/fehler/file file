@@ -1,0 +1,41 @@
+switch (expresssion->u.variableExpression.variable->kind) {
+                case VARIABLE_NAMEDVARIABLE:
+                    printf("in hier named\n");
+                    entry = lookup(symbolTable, expresssion->u.variableExpression.variable->u.namedVariable.name);
+                    if (entry == NULL) {
+                        printf("hier\n");
+                        entry = lookup(locaTable, expresssion->u.variableExpression.variable->u.namedVariable.name);
+                        printf("hier\n");
+                    }
+                    if (entry == NULL) {
+                        undefinedVariable(expresssion->line,
+                                          expresssion->u.variableExpression.variable->u.namedVariable.name);
+                    }
+
+                    switch (entry->kind) {
+                        case ENTRY_KIND_TYPE:
+
+                        case ENTRY_KIND_VAR:
+                            printf("came var\n");
+                            expresssion->dataType = entry->u.varEntry.type;
+
+                            if(isArithExp(declaration->name->string, expresssion, symbolTable)){
+                                printf("true");
+                            }
+                            break;
+                        case ENTRY_KIND_PROC:
+                            printf("came hier");
+                            notAVariable(expresssion->line, entry->name);
+                    }
+
+                    break;
+                case VARIABLE_ARRAYACCESS:
+                    printf("heir\n");
+                    checkExpression(declaration, symbolTable, locaTable, statement,
+                                    expresssion->u.variableExpression.variable->u.arrayAccess.index);
+                    if(!isArithExp(declaration->name->string, expresssion->u.variableExpression.variable->u.arrayAccess.index, symbolTable)) {
+                        indexingWithNonInteger(expresssion->line);
+                    }
+                    break;
+            }
+            break;

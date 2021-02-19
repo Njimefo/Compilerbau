@@ -1,0 +1,5 @@
+proc main() {
+    var i : int;
+    var b : array [8] of int;
+    if(b < b) {}
+}

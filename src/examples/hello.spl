@@ -1,0 +1,152 @@
+proc evaluateDeBrujin(ref memory: Memory, ref memorySize: int, ref index: int, ref success: int) {
+	var fn: int;
+
+	if (memory[index][0] < 0) {
+		// application
+		fn := -memory[index][0] - 1;
+		evaluateDeBrujin(memory, memorySize, fn, success);
+		if (success = 1) {
+			memory[index][0] := -(fn + 1);
+
+			evaluateDeBrujin(memory, memorySize, memory[index][1], success);
+			if (success = 1) {
+				if (memory[fn][0] = 0) {
+					applyDeBrujin(memory, memorySize, fn, memory[index][1], success);
+					if (success = 1) {
+						index := fn;
+					}
+				}
+			}
+		}
+	} else if (memory[index][0] = 0) {
+		// abstraction
+		evaluateDeBrujin(memory, memorySize, memory[index][1], success);
+	} else {
+		// variable
+	}
+}
+
+proc printDeBrujin(ref memory: Memory, index: int) {
+	if (memory[index][0] < 0) {
+		// application
+		printc('(');
+		printDeBrujin(memory, -memory[index][0] - 1);
+		printc(' ');
+		printDeBrujin(memory, memory[index][1]);
+		printc(')');
+	} else if (memory[index][0] = 0) {
+		// abstraction
+		printc('f');
+		printc('n');
+		printc(' ');
+		printDeBrujin(memory, memory[index][1]);
+	} else {
+		// variable
+		printi(memory[index][1]);
+	}
+}
+
+proc generateVariableName(ref entry: DeBrujinEntry, n: int) {
+	var length: int;
+	var primes: int;
+
+	entry[2] := (n - ((n / 26) * 26)) + 'a';
+
+	primes := n / 26;
+	length := 0;
+	while (primes # 0) {
+		length := length + 1;
+		primes := primes / 10;
+	}
+
+	entry[1] := length + 1;
+	primes := n / 26;
+	while (primes # 0) {
+		entry[2 + length] := primes - ((primes / 10) * 10) + '0';
+		primes := primes / 10;
+		length := length - 1;
+	}
+}
+
+proc addNewVariable(ref map: DeBrujinMap, ref size: int, binder: int, ref success: int) {
+	if (size >= 2048) {
+		printErrorOutOfMemory(success);
+	} else {
+		map[size][0] := binder;
+		generateVariableName(map[size], binder);
+		size := size + 1;
+	}
+}
+
+proc printReadableDeBrujinWithMap(ref memory: Memory, index: int, ref map: DeBrujinMap, ref size: int, binder: int, ref success: int) {
+	var i: int;
+	var found: int;
+
+	if (memory[index][0] < 0) {
+		// application
+		printc('(');
+		printReadableDeBrujinWithMap(memory, -memory[index][0] - 1, map, size, binder, success);
+		if (success = 1) {
+			printc(' ');
+			printReadableDeBrujinWithMap(memory, memory[index][1], map, size, binder, success);
+			if (success = 1) {
+				printc(')');
+			}
+		}
+	} else if (memory[index][0] = 0) {
+		// abstraction
+		printc(92);
+		if (size >= 2048) {
+			printErrorOutOfMemory(success);
+		} else {
+			addNewVariable(map, size, binder, success);
+
+			if (success = 1) {
+				i := 0;
+				while (i < map[size - 1][1]) {
+					printc(map[size - 1][2 + i]);
+					i := i + 1;
+				}
+				printc('.');
+				printReadableDeBrujinWithMap(memory, memory[index][1], map, size, binder + 1, success);
+			}
+		}
+	} else {
+		// variable
+		i := 0;
+		found := 0;
+
+		while (i < size) {
+			if (map[i][0] = binder - memory[index][1]) {
+				found := 0;
+				while (found < map[i][1]) {
+					printc(map[i][found + 2]);
+					found := found + 1;
+				}
+
+				found := 1;
+				i := size - 1;
+			}
+			i := i + 1;
+		}
+
+		if (found = 0) {
+			// [error] free variables can not be printed
+			printc(91); printc(101); printc(114); printc(114); printc(111); printc(114); printc(93); printc(32);
+			printc(102); printc(114); printc(101); printc(101); printc(32); printc(118); printc(97); printc(114);
+			printc(105); printc(97); printc(98); printc(108); printc(101); printc(115); printc(32); printc(99);
+			printc(97); printc(110); printc(32); printc(110); printc(111); printc(116); printc(32); printc(98);
+			printc(101); printc(32); printc(112); printc(114); printc(105); printc(110); printc(116); printc(101);
+			printc(100); printc('\n');
+            success := 0;
+		}
+	}
+}
+
+proc printReadableDeBrujin(ref memory: Memory, index: int, ref success: int) {
+	var map: DeBrujinMap;
+	var size: int;
+
+	size := 0;
+	printReadableDeBrujinWithMap(memory, index, map, size, 0, success);
+}

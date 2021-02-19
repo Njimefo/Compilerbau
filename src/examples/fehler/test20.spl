@@ -1,0 +1,7 @@
+ proc main(){
+     var i : array[9] of int;
+
+     var a : int;
+      i :=  a+ a ;
+
+ }

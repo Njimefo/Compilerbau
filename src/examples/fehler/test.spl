@@ -1,0 +1,5 @@
+type a = array[9] of int;
+
+proc add(ref i : array[9] of int) {}
+
+proc main() {}

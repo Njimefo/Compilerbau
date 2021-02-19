@@ -1,0 +1,8 @@
+
+type x= int;
+
+proc main(i : array[9] of int) {
+var s: x;
+var t: main;
+
+}

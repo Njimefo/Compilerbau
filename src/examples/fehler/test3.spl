@@ -1,0 +1,6 @@
+
+type myInt=int;
+
+proc main(i :int, ref j :int){
+
+}

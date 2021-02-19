@@ -1,0 +1,1594 @@
+Grammar
+
+    0 $accept: program $end
+
+    1 program: DeclarationList
+
+    2 DeclarationList: Declaration DeclarationList
+    3                | %empty
+
+    4 Declaration: TypeDef
+    5            | ProcDef
+
+    6 TypeDef: TYPE IDENT EQ IDENT SEMIC
+    7        | TYPE IDENT EQ ArrayDef SEMIC
+
+    8 ArrayDef: ARRAY LBRACK INTLIT RBRACK OF IDENT
+    9         | ARRAY LBRACK INTLIT RBRACK OF ArrayDef
+
+   10 ProcDef: PROC IDENT LPAREN ProcDefParamList RPAREN LCURL RCURL
+   11        | PROC IDENT LPAREN ProcDefParamList RPAREN LCURL VariableDeclList RCURL
+   12        | PROC IDENT LPAREN ProcDefParamList RPAREN LCURL VariableDeclList StatementList RCURL
+   13        | PROC IDENT LPAREN ProcDefParamList RPAREN LCURL StatementList RCURL
+
+   14 ProcDefParamList: %empty
+   15                 | ProcDefParam SubProcDefParamList
+
+   16 SubProcDefParamList: %empty
+   17                    | COMMA ProcDefParam SubProcDefParamList
+
+   18 ProcDefParam: ProcDefParamContent
+   19             | REF ProcDefParamContent
+
+   20 ProcDefParamContent: IDENT COLON VariableDeclContent
+
+   21 VariableDeclList: VariableDecl
+   22                 | VariableDecl VariableDeclList
+
+   23 VariableDecl: VAR IDENT COLON VariableDeclContent SEMIC
+
+   24 VariableDeclContent: IDENT
+   25                    | ArrayDef
+
+   26 StatementList: Statement
+   27              | Statement StatementList
+
+   28 Statement: IfElseStatement
+   29          | WhileStatement
+
+   30 IfElseStatement: IfElseBalanced
+   31                | IfElseUnBalanced
+
+   32 IfElseBalanced: EmptyStatement
+   33               | AssignStatement
+   34               | PocCallStatement
+   35               | BlockStatement
+   36               | IF LPAREN LogicalExpression RPAREN IfElseBalanced ELSE IfElseBalanced
+
+   37 IfElseUnBalanced: IF LPAREN LogicalExpression RPAREN Statement
+   38                 | IF LPAREN LogicalExpression RPAREN IfElseBalanced ELSE IfElseUnBalanced
+
+   39 BlockStatement: LCURL RCURL
+   40               | LCURL StatementList RCURL
+
+   41 EmptyStatement: SEMIC
+
+   42 AssignStatement: Variable ASGN LogicalExpression SEMIC
+
+   43 WhileStatement: WHILE LPAREN LogicalExpression RPAREN Statement
+
+   44 PocCallStatement: IDENT LPAREN RPAREN SEMIC
+   45                 | IDENT LPAREN PocCallParamList RPAREN SEMIC
+
+   46 PocCallParamList: ArithExpression
+   47                 | ArithExpression COMMA PocCallParamList
+
+   48 LogicalExpression: ArithExpression EQ ArithExpression
+   49                  | ArithExpression NE ArithExpression
+   50                  | ArithExpression LT ArithExpression
+   51                  | ArithExpression LE ArithExpression
+   52                  | ArithExpression GT ArithExpression
+   53                  | ArithExpression GE ArithExpression
+   54                  | ArithExpression
+
+   55 ArithExpression: ArithExpression PLUS ArithTherm
+   56                | ArithExpression MINUS ArithTherm
+   57                | ArithTherm
+
+   58 ArithTherm: ArithTherm STAR ArithFactor
+   59           | ArithTherm SLASH ArithFactor
+   60           | ArithFactor
+
+   61 ArithFactor: MINUS ArithFactor
+   62            | INTLIT
+   63            | Variable
+   64            | LPAREN ArithExpression RPAREN
+
+   65 Variable: IDENT
+   66         | Variable LBRACK ArithExpression RBRACK
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    error (256)
+    ARRAY <noVal> (258) 8 9
+    ELSE <noVal> (259) 36 38
+    IF <noVal> (260) 36 37 38
+    OF <noVal> (261) 8 9
+    PROC <noVal> (262) 10 11 12 13
+    REF <noVal> (263) 19
+    TYPE <noVal> (264) 6 7
+    VAR <noVal> (265) 23
+    WHILE <noVal> (266) 43
+    LPAREN <noVal> (267) 10 11 12 13 36 37 38 43 44 45 64
+    RPAREN <noVal> (268) 10 11 12 13 36 37 38 43 44 45 64
+    LBRACK <noVal> (269) 8 9 66
+    RBRACK <noVal> (270) 8 9 66
+    LCURL <noVal> (271) 10 11 12 13 39 40
+    RCURL <noVal> (272) 10 11 12 13 39 40
+    EQ <noVal> (273) 6 7 48
+    NE <noVal> (274) 49
+    LT <noVal> (275) 50
+    LE <noVal> (276) 51
+    GT <noVal> (277) 52
+    GE <noVal> (278) 53
+    ASGN <noVal> (279) 42
+    COLON <noVal> (280) 20 23
+    COMMA <noVal> (281) 17 47
+    SEMIC <noVal> (282) 6 7 23 41 42 44 45
+    PLUS <noVal> (283) 55
+    MINUS <noVal> (284) 56 61
+    STAR <noVal> (285) 58
+    SLASH <noVal> (286) 59
+    IDENT <stringVal> (287) 6 7 8 10 11 12 13 20 23 24 44 45 65
+    INTLIT <intVal> (288) 8 9 62
+
+
+Nonterminals, with rules where they appear
+
+    $accept (34)
+        on left: 0
+    program (35)
+        on left: 1
+        on right: 0
+    DeclarationList <globalDeclarationList> (36)
+        on left: 2 3
+        on right: 1 2
+    Declaration <globalDeclaration> (37)
+        on left: 4 5
+        on right: 2
+    TypeDef <globalDeclaration> (38)
+        on left: 6 7
+        on right: 4
+    ArrayDef <typeExpression> (39)
+        on left: 8 9
+        on right: 7 9 25
+    ProcDef <globalDeclaration> (40)
+        on left: 10 11 12 13
+        on right: 5
+    ProcDefParamList <parameterList> (41)
+        on left: 14 15
+        on right: 10 11 12 13
+    SubProcDefParamList <parameterList> (42)
+        on left: 16 17
+        on right: 15 17
+    ProcDefParam <parameterDeclaration> (43)
+        on left: 18 19
+        on right: 15 17
+    ProcDefParamContent <parameterDeclaration> (44)
+        on left: 20
+        on right: 18 19
+    VariableDeclList <variableList> (45)
+        on left: 21 22
+        on right: 11 12 22
+    VariableDecl <variableDeclaration> (46)
+        on left: 23
+        on right: 21 22
+    VariableDeclContent <typeExpression> (47)
+        on left: 24 25
+        on right: 20 23
+    StatementList <statementList> (48)
+        on left: 26 27
+        on right: 12 13 27 40
+    Statement <statement> (49)
+        on left: 28 29
+        on right: 26 27 37 43
+    IfElseStatement <statement> (50)
+        on left: 30 31
+        on right: 28
+    IfElseBalanced <statement> (51)
+        on left: 32 33 34 35 36
+        on right: 30 36 38
+    IfElseUnBalanced <statement> (52)
+        on left: 37 38
+        on right: 31 38
+    BlockStatement <statement> (53)
+        on left: 39 40
+        on right: 35
+    EmptyStatement <statement> (54)
+        on left: 41
+        on right: 32
+    AssignStatement <statement> (55)
+        on left: 42
+        on right: 33
+    WhileStatement <statement> (56)
+        on left: 43
+        on right: 29
+    PocCallStatement <statement> (57)
+        on left: 44 45
+        on right: 34
+    PocCallParamList <expressionList> (58)
+        on left: 46 47
+        on right: 45 47
+    LogicalExpression <expression> (59)
+        on left: 48 49 50 51 52 53 54
+        on right: 36 37 38 42 43
+    ArithExpression <expression> (60)
+        on left: 55 56 57
+        on right: 46 47 48 49 50 51 52 53 54 55 56 64 66
+    ArithTherm <expression> (61)
+        on left: 58 59 60
+        on right: 55 56 57 58 59
+    ArithFactor <expression> (62)
+        on left: 61 62 63 64
+        on right: 58 59 60 61
+    Variable <variable> (63)
+        on left: 65 66
+        on right: 42 63 66
+
+
+State 0
+
+    0 $accept: . program $end
+
+    PROC  shift, and go to state 1
+    TYPE  shift, and go to state 2
+
+    $default  reduce using rule 3 (DeclarationList)
+
+    program          go to state 3
+    DeclarationList  go to state 4
+    Declaration      go to state 5
+    TypeDef          go to state 6
+    ProcDef          go to state 7
+
+
+State 1
+
+   10 ProcDef: PROC . IDENT LPAREN ProcDefParamList RPAREN LCURL RCURL
+   11        | PROC . IDENT LPAREN ProcDefParamList RPAREN LCURL VariableDeclList RCURL
+   12        | PROC . IDENT LPAREN ProcDefParamList RPAREN LCURL VariableDeclList StatementList RCURL
+   13        | PROC . IDENT LPAREN ProcDefParamList RPAREN LCURL StatementList RCURL
+
+    IDENT  shift, and go to state 8
+
+
+State 2
+
+    6 TypeDef: TYPE . IDENT EQ IDENT SEMIC
+    7        | TYPE . IDENT EQ ArrayDef SEMIC
+
+    IDENT  shift, and go to state 9
+
+
+State 3
+
+    0 $accept: program . $end
+
+    $end  shift, and go to state 10
+
+
+State 4
+
+    1 program: DeclarationList .
+
+    $default  reduce using rule 1 (program)
+
+
+State 5
+
+    2 DeclarationList: Declaration . DeclarationList
+
+    PROC  shift, and go to state 1
+    TYPE  shift, and go to state 2
+
+    $default  reduce using rule 3 (DeclarationList)
+
+    DeclarationList  go to state 11
+    Declaration      go to state 5
+    TypeDef          go to state 6
+    ProcDef          go to state 7
+
+
+State 6
+
+    4 Declaration: TypeDef .
+
+    $default  reduce using rule 4 (Declaration)
+
+
+State 7
+
+    5 Declaration: ProcDef .
+
+    $default  reduce using rule 5 (Declaration)
+
+
+State 8
+
+   10 ProcDef: PROC IDENT . LPAREN ProcDefParamList RPAREN LCURL RCURL
+   11        | PROC IDENT . LPAREN ProcDefParamList RPAREN LCURL VariableDeclList RCURL
+   12        | PROC IDENT . LPAREN ProcDefParamList RPAREN LCURL VariableDeclList StatementList RCURL
+   13        | PROC IDENT . LPAREN ProcDefParamList RPAREN LCURL StatementList RCURL
+
+    LPAREN  shift, and go to state 12
+
+
+State 9
+
+    6 TypeDef: TYPE IDENT . EQ IDENT SEMIC
+    7        | TYPE IDENT . EQ ArrayDef SEMIC
+
+    EQ  shift, and go to state 13
+
+
+State 10
+
+    0 $accept: program $end .
+
+    $default  accept
+
+
+State 11
+
+    2 DeclarationList: Declaration DeclarationList .
+
+    $default  reduce using rule 2 (DeclarationList)
+
+
+State 12
+
+   10 ProcDef: PROC IDENT LPAREN . ProcDefParamList RPAREN LCURL RCURL
+   11        | PROC IDENT LPAREN . ProcDefParamList RPAREN LCURL VariableDeclList RCURL
+   12        | PROC IDENT LPAREN . ProcDefParamList RPAREN LCURL VariableDeclList StatementList RCURL
+   13        | PROC IDENT LPAREN . ProcDefParamList RPAREN LCURL StatementList RCURL
+
+    REF    shift, and go to state 14
+    IDENT  shift, and go to state 15
+
+    $default  reduce using rule 14 (ProcDefParamList)
+
+    ProcDefParamList     go to state 16
+    ProcDefParam         go to state 17
+    ProcDefParamContent  go to state 18
+
+
+State 13
+
+    6 TypeDef: TYPE IDENT EQ . IDENT SEMIC
+    7        | TYPE IDENT EQ . ArrayDef SEMIC
+
+    ARRAY  shift, and go to state 19
+    IDENT  shift, and go to state 20
+
+    ArrayDef  go to state 21
+
+
+State 14
+
+   19 ProcDefParam: REF . ProcDefParamContent
+
+    IDENT  shift, and go to state 15
+
+    ProcDefParamContent  go to state 22
+
+
+State 15
+
+   20 ProcDefParamContent: IDENT . COLON VariableDeclContent
+
+    COLON  shift, and go to state 23
+
+
+State 16
+
+   10 ProcDef: PROC IDENT LPAREN ProcDefParamList . RPAREN LCURL RCURL
+   11        | PROC IDENT LPAREN ProcDefParamList . RPAREN LCURL VariableDeclList RCURL
+   12        | PROC IDENT LPAREN ProcDefParamList . RPAREN LCURL VariableDeclList StatementList RCURL
+   13        | PROC IDENT LPAREN ProcDefParamList . RPAREN LCURL StatementList RCURL
+
+    RPAREN  shift, and go to state 24
+
+
+State 17
+
+   15 ProcDefParamList: ProcDefParam . SubProcDefParamList
+
+    COMMA  shift, and go to state 25
+
+    $default  reduce using rule 16 (SubProcDefParamList)
+
+    SubProcDefParamList  go to state 26
+
+
+State 18
+
+   18 ProcDefParam: ProcDefParamContent .
+
+    $default  reduce using rule 18 (ProcDefParam)
+
+
+State 19
+
+    8 ArrayDef: ARRAY . LBRACK INTLIT RBRACK OF IDENT
+    9         | ARRAY . LBRACK INTLIT RBRACK OF ArrayDef
+
+    LBRACK  shift, and go to state 27
+
+
+State 20
+
+    6 TypeDef: TYPE IDENT EQ IDENT . SEMIC
+
+    SEMIC  shift, and go to state 28
+
+
+State 21
+
+    7 TypeDef: TYPE IDENT EQ ArrayDef . SEMIC
+
+    SEMIC  shift, and go to state 29
+
+
+State 22
+
+   19 ProcDefParam: REF ProcDefParamContent .
+
+    $default  reduce using rule 19 (ProcDefParam)
+
+
+State 23
+
+   20 ProcDefParamContent: IDENT COLON . VariableDeclContent
+
+    ARRAY  shift, and go to state 19
+    IDENT  shift, and go to state 30
+
+    ArrayDef             go to state 31
+    VariableDeclContent  go to state 32
+
+
+State 24
+
+   10 ProcDef: PROC IDENT LPAREN ProcDefParamList RPAREN . LCURL RCURL
+   11        | PROC IDENT LPAREN ProcDefParamList RPAREN . LCURL VariableDeclList RCURL
+   12        | PROC IDENT LPAREN ProcDefParamList RPAREN . LCURL VariableDeclList StatementList RCURL
+   13        | PROC IDENT LPAREN ProcDefParamList RPAREN . LCURL StatementList RCURL
+
+    LCURL  shift, and go to state 33
+
+
+State 25
+
+   17 SubProcDefParamList: COMMA . ProcDefParam SubProcDefParamList
+
+    REF    shift, and go to state 14
+    IDENT  shift, and go to state 15
+
+    ProcDefParam         go to state 34
+    ProcDefParamContent  go to state 18
+
+
+State 26
+
+   15 ProcDefParamList: ProcDefParam SubProcDefParamList .
+
+    $default  reduce using rule 15 (ProcDefParamList)
+
+
+State 27
+
+    8 ArrayDef: ARRAY LBRACK . INTLIT RBRACK OF IDENT
+    9         | ARRAY LBRACK . INTLIT RBRACK OF ArrayDef
+
+    INTLIT  shift, and go to state 35
+
+
+State 28
+
+    6 TypeDef: TYPE IDENT EQ IDENT SEMIC .
+
+    $default  reduce using rule 6 (TypeDef)
+
+
+State 29
+
+    7 TypeDef: TYPE IDENT EQ ArrayDef SEMIC .
+
+    $default  reduce using rule 7 (TypeDef)
+
+
+State 30
+
+   24 VariableDeclContent: IDENT .
+
+    $default  reduce using rule 24 (VariableDeclContent)
+
+
+State 31
+
+   25 VariableDeclContent: ArrayDef .
+
+    $default  reduce using rule 25 (VariableDeclContent)
+
+
+State 32
+
+   20 ProcDefParamContent: IDENT COLON VariableDeclContent .
+
+    $default  reduce using rule 20 (ProcDefParamContent)
+
+
+State 33
+
+   10 ProcDef: PROC IDENT LPAREN ProcDefParamList RPAREN LCURL . RCURL
+   11        | PROC IDENT LPAREN ProcDefParamList RPAREN LCURL . VariableDeclList RCURL
+   12        | PROC IDENT LPAREN ProcDefParamList RPAREN LCURL . VariableDeclList StatementList RCURL
+   13        | PROC IDENT LPAREN ProcDefParamList RPAREN LCURL . StatementList RCURL
+
+    IF     shift, and go to state 36
+    VAR    shift, and go to state 37
+    WHILE  shift, and go to state 38
+    LCURL  shift, and go to state 39
+    RCURL  shift, and go to state 40
+    SEMIC  shift, and go to state 41
+    IDENT  shift, and go to state 42
+
+    VariableDeclList  go to state 43
+    VariableDecl      go to state 44
+    StatementList     go to state 45
+    Statement         go to state 46
+    IfElseStatement   go to state 47
+    IfElseBalanced    go to state 48
+    IfElseUnBalanced  go to state 49
+    BlockStatement    go to state 50
+    EmptyStatement    go to state 51
+    AssignStatement   go to state 52
+    WhileStatement    go to state 53
+    PocCallStatement  go to state 54
+    Variable          go to state 55
+
+
+State 34
+
+   17 SubProcDefParamList: COMMA ProcDefParam . SubProcDefParamList
+
+    COMMA  shift, and go to state 25
+
+    $default  reduce using rule 16 (SubProcDefParamList)
+
+    SubProcDefParamList  go to state 56
+
+
+State 35
+
+    8 ArrayDef: ARRAY LBRACK INTLIT . RBRACK OF IDENT
+    9         | ARRAY LBRACK INTLIT . RBRACK OF ArrayDef
+
+    RBRACK  shift, and go to state 57
+
+
+State 36
+
+   36 IfElseBalanced: IF . LPAREN LogicalExpression RPAREN IfElseBalanced ELSE IfElseBalanced
+   37 IfElseUnBalanced: IF . LPAREN LogicalExpression RPAREN Statement
+   38                 | IF . LPAREN LogicalExpression RPAREN IfElseBalanced ELSE IfElseUnBalanced
+
+    LPAREN  shift, and go to state 58
+
+
+State 37
+
+   23 VariableDecl: VAR . IDENT COLON VariableDeclContent SEMIC
+
+    IDENT  shift, and go to state 59
+
+
+State 38
+
+   43 WhileStatement: WHILE . LPAREN LogicalExpression RPAREN Statement
+
+    LPAREN  shift, and go to state 60
+
+
+State 39
+
+   39 BlockStatement: LCURL . RCURL
+   40               | LCURL . StatementList RCURL
+
+    IF     shift, and go to state 36
+    WHILE  shift, and go to state 38
+    LCURL  shift, and go to state 39
+    RCURL  shift, and go to state 61
+    SEMIC  shift, and go to state 41
+    IDENT  shift, and go to state 42
+
+    StatementList     go to state 62
+    Statement         go to state 46
+    IfElseStatement   go to state 47
+    IfElseBalanced    go to state 48
+    IfElseUnBalanced  go to state 49
+    BlockStatement    go to state 50
+    EmptyStatement    go to state 51
+    AssignStatement   go to state 52
+    WhileStatement    go to state 53
+    PocCallStatement  go to state 54
+    Variable          go to state 55
+
+
+State 40
+
+   10 ProcDef: PROC IDENT LPAREN ProcDefParamList RPAREN LCURL RCURL .
+
+    $default  reduce using rule 10 (ProcDef)
+
+
+State 41
+
+   41 EmptyStatement: SEMIC .
+
+    $default  reduce using rule 41 (EmptyStatement)
+
+
+State 42
+
+   44 PocCallStatement: IDENT . LPAREN RPAREN SEMIC
+   45                 | IDENT . LPAREN PocCallParamList RPAREN SEMIC
+   65 Variable: IDENT .
+
+    LPAREN  shift, and go to state 63
+
+    $default  reduce using rule 65 (Variable)
+
+
+State 43
+
+   11 ProcDef: PROC IDENT LPAREN ProcDefParamList RPAREN LCURL VariableDeclList . RCURL
+   12        | PROC IDENT LPAREN ProcDefParamList RPAREN LCURL VariableDeclList . StatementList RCURL
+
+    IF     shift, and go to state 36
+    WHILE  shift, and go to state 38
+    LCURL  shift, and go to state 39
+    RCURL  shift, and go to state 64
+    SEMIC  shift, and go to state 41
+    IDENT  shift, and go to state 42
+
+    StatementList     go to state 65
+    Statement         go to state 46
+    IfElseStatement   go to state 47
+    IfElseBalanced    go to state 48
+    IfElseUnBalanced  go to state 49
+    BlockStatement    go to state 50
+    EmptyStatement    go to state 51
+    AssignStatement   go to state 52
+    WhileStatement    go to state 53
+    PocCallStatement  go to state 54
+    Variable          go to state 55
+
+
+State 44
+
+   21 VariableDeclList: VariableDecl .
+   22                 | VariableDecl . VariableDeclList
+
+    VAR  shift, and go to state 37
+
+    $default  reduce using rule 21 (VariableDeclList)
+
+    VariableDeclList  go to state 66
+    VariableDecl      go to state 44
+
+
+State 45
+
+   13 ProcDef: PROC IDENT LPAREN ProcDefParamList RPAREN LCURL StatementList . RCURL
+
+    RCURL  shift, and go to state 67
+
+
+State 46
+
+   26 StatementList: Statement .
+   27              | Statement . StatementList
+
+    IF     shift, and go to state 36
+    WHILE  shift, and go to state 38
+    LCURL  shift, and go to state 39
+    SEMIC  shift, and go to state 41
+    IDENT  shift, and go to state 42
+
+    $default  reduce using rule 26 (StatementList)
+
+    StatementList     go to state 68
+    Statement         go to state 46
+    IfElseStatement   go to state 47
+    IfElseBalanced    go to state 48
+    IfElseUnBalanced  go to state 49
+    BlockStatement    go to state 50
+    EmptyStatement    go to state 51
+    AssignStatement   go to state 52
+    WhileStatement    go to state 53
+    PocCallStatement  go to state 54
+    Variable          go to state 55
+
+
+State 47
+
+   28 Statement: IfElseStatement .
+
+    $default  reduce using rule 28 (Statement)
+
+
+State 48
+
+   30 IfElseStatement: IfElseBalanced .
+
+    $default  reduce using rule 30 (IfElseStatement)
+
+
+State 49
+
+   31 IfElseStatement: IfElseUnBalanced .
+
+    $default  reduce using rule 31 (IfElseStatement)
+
+
+State 50
+
+   35 IfElseBalanced: BlockStatement .
+
+    $default  reduce using rule 35 (IfElseBalanced)
+
+
+State 51
+
+   32 IfElseBalanced: EmptyStatement .
+
+    $default  reduce using rule 32 (IfElseBalanced)
+
+
+State 52
+
+   33 IfElseBalanced: AssignStatement .
+
+    $default  reduce using rule 33 (IfElseBalanced)
+
+
+State 53
+
+   29 Statement: WhileStatement .
+
+    $default  reduce using rule 29 (Statement)
+
+
+State 54
+
+   34 IfElseBalanced: PocCallStatement .
+
+    $default  reduce using rule 34 (IfElseBalanced)
+
+
+State 55
+
+   42 AssignStatement: Variable . ASGN LogicalExpression SEMIC
+   66 Variable: Variable . LBRACK ArithExpression RBRACK
+
+    LBRACK  shift, and go to state 69
+    ASGN    shift, and go to state 70
+
+
+State 56
+
+   17 SubProcDefParamList: COMMA ProcDefParam SubProcDefParamList .
+
+    $default  reduce using rule 17 (SubProcDefParamList)
+
+
+State 57
+
+    8 ArrayDef: ARRAY LBRACK INTLIT RBRACK . OF IDENT
+    9         | ARRAY LBRACK INTLIT RBRACK . OF ArrayDef
+
+    OF  shift, and go to state 71
+
+
+State 58
+
+   36 IfElseBalanced: IF LPAREN . LogicalExpression RPAREN IfElseBalanced ELSE IfElseBalanced
+   37 IfElseUnBalanced: IF LPAREN . LogicalExpression RPAREN Statement
+   38                 | IF LPAREN . LogicalExpression RPAREN IfElseBalanced ELSE IfElseUnBalanced
+
+    LPAREN  shift, and go to state 72
+    MINUS   shift, and go to state 73
+    IDENT   shift, and go to state 74
+    INTLIT  shift, and go to state 75
+
+    LogicalExpression  go to state 76
+    ArithExpression    go to state 77
+    ArithTherm         go to state 78
+    ArithFactor        go to state 79
+    Variable           go to state 80
+
+
+State 59
+
+   23 VariableDecl: VAR IDENT . COLON VariableDeclContent SEMIC
+
+    COLON  shift, and go to state 81
+
+
+State 60
+
+   43 WhileStatement: WHILE LPAREN . LogicalExpression RPAREN Statement
+
+    LPAREN  shift, and go to state 72
+    MINUS   shift, and go to state 73
+    IDENT   shift, and go to state 74
+    INTLIT  shift, and go to state 75
+
+    LogicalExpression  go to state 82
+    ArithExpression    go to state 77
+    ArithTherm         go to state 78
+    ArithFactor        go to state 79
+    Variable           go to state 80
+
+
+State 61
+
+   39 BlockStatement: LCURL RCURL .
+
+    $default  reduce using rule 39 (BlockStatement)
+
+
+State 62
+
+   40 BlockStatement: LCURL StatementList . RCURL
+
+    RCURL  shift, and go to state 83
+
+
+State 63
+
+   44 PocCallStatement: IDENT LPAREN . RPAREN SEMIC
+   45                 | IDENT LPAREN . PocCallParamList RPAREN SEMIC
+
+    LPAREN  shift, and go to state 72
+    RPAREN  shift, and go to state 84
+    MINUS   shift, and go to state 73
+    IDENT   shift, and go to state 74
+    INTLIT  shift, and go to state 75
+
+    PocCallParamList  go to state 85
+    ArithExpression   go to state 86
+    ArithTherm        go to state 78
+    ArithFactor       go to state 79
+    Variable          go to state 80
+
+
+State 64
+
+   11 ProcDef: PROC IDENT LPAREN ProcDefParamList RPAREN LCURL VariableDeclList RCURL .
+
+    $default  reduce using rule 11 (ProcDef)
+
+
+State 65
+
+   12 ProcDef: PROC IDENT LPAREN ProcDefParamList RPAREN LCURL VariableDeclList StatementList . RCURL
+
+    RCURL  shift, and go to state 87
+
+
+State 66
+
+   22 VariableDeclList: VariableDecl VariableDeclList .
+
+    $default  reduce using rule 22 (VariableDeclList)
+
+
+State 67
+
+   13 ProcDef: PROC IDENT LPAREN ProcDefParamList RPAREN LCURL StatementList RCURL .
+
+    $default  reduce using rule 13 (ProcDef)
+
+
+State 68
+
+   27 StatementList: Statement StatementList .
+
+    $default  reduce using rule 27 (StatementList)
+
+
+State 69
+
+   66 Variable: Variable LBRACK . ArithExpression RBRACK
+
+    LPAREN  shift, and go to state 72
+    MINUS   shift, and go to state 73
+    IDENT   shift, and go to state 74
+    INTLIT  shift, and go to state 75
+
+    ArithExpression  go to state 88
+    ArithTherm       go to state 78
+    ArithFactor      go to state 79
+    Variable         go to state 80
+
+
+State 70
+
+   42 AssignStatement: Variable ASGN . LogicalExpression SEMIC
+
+    LPAREN  shift, and go to state 72
+    MINUS   shift, and go to state 73
+    IDENT   shift, and go to state 74
+    INTLIT  shift, and go to state 75
+
+    LogicalExpression  go to state 89
+    ArithExpression    go to state 77
+    ArithTherm         go to state 78
+    ArithFactor        go to state 79
+    Variable           go to state 80
+
+
+State 71
+
+    8 ArrayDef: ARRAY LBRACK INTLIT RBRACK OF . IDENT
+    9         | ARRAY LBRACK INTLIT RBRACK OF . ArrayDef
+
+    ARRAY  shift, and go to state 19
+    IDENT  shift, and go to state 90
+
+    ArrayDef  go to state 91
+
+
+State 72
+
+   64 ArithFactor: LPAREN . ArithExpression RPAREN
+
+    LPAREN  shift, and go to state 72
+    MINUS   shift, and go to state 73
+    IDENT   shift, and go to state 74
+    INTLIT  shift, and go to state 75
+
+    ArithExpression  go to state 92
+    ArithTherm       go to state 78
+    ArithFactor      go to state 79
+    Variable         go to state 80
+
+
+State 73
+
+   61 ArithFactor: MINUS . ArithFactor
+
+    LPAREN  shift, and go to state 72
+    MINUS   shift, and go to state 73
+    IDENT   shift, and go to state 74
+    INTLIT  shift, and go to state 75
+
+    ArithFactor  go to state 93
+    Variable     go to state 80
+
+
+State 74
+
+   65 Variable: IDENT .
+
+    $default  reduce using rule 65 (Variable)
+
+
+State 75
+
+   62 ArithFactor: INTLIT .
+
+    $default  reduce using rule 62 (ArithFactor)
+
+
+State 76
+
+   36 IfElseBalanced: IF LPAREN LogicalExpression . RPAREN IfElseBalanced ELSE IfElseBalanced
+   37 IfElseUnBalanced: IF LPAREN LogicalExpression . RPAREN Statement
+   38                 | IF LPAREN LogicalExpression . RPAREN IfElseBalanced ELSE IfElseUnBalanced
+
+    RPAREN  shift, and go to state 94
+
+
+State 77
+
+   48 LogicalExpression: ArithExpression . EQ ArithExpression
+   49                  | ArithExpression . NE ArithExpression
+   50                  | ArithExpression . LT ArithExpression
+   51                  | ArithExpression . LE ArithExpression
+   52                  | ArithExpression . GT ArithExpression
+   53                  | ArithExpression . GE ArithExpression
+   54                  | ArithExpression .
+   55 ArithExpression: ArithExpression . PLUS ArithTherm
+   56                | ArithExpression . MINUS ArithTherm
+
+    EQ     shift, and go to state 95
+    NE     shift, and go to state 96
+    LT     shift, and go to state 97
+    LE     shift, and go to state 98
+    GT     shift, and go to state 99
+    GE     shift, and go to state 100
+    PLUS   shift, and go to state 101
+    MINUS  shift, and go to state 102
+
+    $default  reduce using rule 54 (LogicalExpression)
+
+
+State 78
+
+   57 ArithExpression: ArithTherm .
+   58 ArithTherm: ArithTherm . STAR ArithFactor
+   59           | ArithTherm . SLASH ArithFactor
+
+    STAR   shift, and go to state 103
+    SLASH  shift, and go to state 104
+
+    $default  reduce using rule 57 (ArithExpression)
+
+
+State 79
+
+   60 ArithTherm: ArithFactor .
+
+    $default  reduce using rule 60 (ArithTherm)
+
+
+State 80
+
+   63 ArithFactor: Variable .
+   66 Variable: Variable . LBRACK ArithExpression RBRACK
+
+    LBRACK  shift, and go to state 69
+
+    $default  reduce using rule 63 (ArithFactor)
+
+
+State 81
+
+   23 VariableDecl: VAR IDENT COLON . VariableDeclContent SEMIC
+
+    ARRAY  shift, and go to state 19
+    IDENT  shift, and go to state 30
+
+    ArrayDef             go to state 31
+    VariableDeclContent  go to state 105
+
+
+State 82
+
+   43 WhileStatement: WHILE LPAREN LogicalExpression . RPAREN Statement
+
+    RPAREN  shift, and go to state 106
+
+
+State 83
+
+   40 BlockStatement: LCURL StatementList RCURL .
+
+    $default  reduce using rule 40 (BlockStatement)
+
+
+State 84
+
+   44 PocCallStatement: IDENT LPAREN RPAREN . SEMIC
+
+    SEMIC  shift, and go to state 107
+
+
+State 85
+
+   45 PocCallStatement: IDENT LPAREN PocCallParamList . RPAREN SEMIC
+
+    RPAREN  shift, and go to state 108
+
+
+State 86
+
+   46 PocCallParamList: ArithExpression .
+   47                 | ArithExpression . COMMA PocCallParamList
+   55 ArithExpression: ArithExpression . PLUS ArithTherm
+   56                | ArithExpression . MINUS ArithTherm
+
+    COMMA  shift, and go to state 109
+    PLUS   shift, and go to state 101
+    MINUS  shift, and go to state 102
+
+    $default  reduce using rule 46 (PocCallParamList)
+
+
+State 87
+
+   12 ProcDef: PROC IDENT LPAREN ProcDefParamList RPAREN LCURL VariableDeclList StatementList RCURL .
+
+    $default  reduce using rule 12 (ProcDef)
+
+
+State 88
+
+   55 ArithExpression: ArithExpression . PLUS ArithTherm
+   56                | ArithExpression . MINUS ArithTherm
+   66 Variable: Variable LBRACK ArithExpression . RBRACK
+
+    RBRACK  shift, and go to state 110
+    PLUS    shift, and go to state 101
+    MINUS   shift, and go to state 102
+
+
+State 89
+
+   42 AssignStatement: Variable ASGN LogicalExpression . SEMIC
+
+    SEMIC  shift, and go to state 111
+
+
+State 90
+
+    8 ArrayDef: ARRAY LBRACK INTLIT RBRACK OF IDENT .
+
+    $default  reduce using rule 8 (ArrayDef)
+
+
+State 91
+
+    9 ArrayDef: ARRAY LBRACK INTLIT RBRACK OF ArrayDef .
+
+    $default  reduce using rule 9 (ArrayDef)
+
+
+State 92
+
+   55 ArithExpression: ArithExpression . PLUS ArithTherm
+   56                | ArithExpression . MINUS ArithTherm
+   64 ArithFactor: LPAREN ArithExpression . RPAREN
+
+    RPAREN  shift, and go to state 112
+    PLUS    shift, and go to state 101
+    MINUS   shift, and go to state 102
+
+
+State 93
+
+   61 ArithFactor: MINUS ArithFactor .
+
+    $default  reduce using rule 61 (ArithFactor)
+
+
+State 94
+
+   36 IfElseBalanced: IF LPAREN LogicalExpression RPAREN . IfElseBalanced ELSE IfElseBalanced
+   37 IfElseUnBalanced: IF LPAREN LogicalExpression RPAREN . Statement
+   38                 | IF LPAREN LogicalExpression RPAREN . IfElseBalanced ELSE IfElseUnBalanced
+
+    IF     shift, and go to state 36
+    WHILE  shift, and go to state 38
+    LCURL  shift, and go to state 39
+    SEMIC  shift, and go to state 41
+    IDENT  shift, and go to state 42
+
+    Statement         go to state 113
+    IfElseStatement   go to state 47
+    IfElseBalanced    go to state 114
+    IfElseUnBalanced  go to state 49
+    BlockStatement    go to state 50
+    EmptyStatement    go to state 51
+    AssignStatement   go to state 52
+    WhileStatement    go to state 53
+    PocCallStatement  go to state 54
+    Variable          go to state 55
+
+
+State 95
+
+   48 LogicalExpression: ArithExpression EQ . ArithExpression
+
+    LPAREN  shift, and go to state 72
+    MINUS   shift, and go to state 73
+    IDENT   shift, and go to state 74
+    INTLIT  shift, and go to state 75
+
+    ArithExpression  go to state 115
+    ArithTherm       go to state 78
+    ArithFactor      go to state 79
+    Variable         go to state 80
+
+
+State 96
+
+   49 LogicalExpression: ArithExpression NE . ArithExpression
+
+    LPAREN  shift, and go to state 72
+    MINUS   shift, and go to state 73
+    IDENT   shift, and go to state 74
+    INTLIT  shift, and go to state 75
+
+    ArithExpression  go to state 116
+    ArithTherm       go to state 78
+    ArithFactor      go to state 79
+    Variable         go to state 80
+
+
+State 97
+
+   50 LogicalExpression: ArithExpression LT . ArithExpression
+
+    LPAREN  shift, and go to state 72
+    MINUS   shift, and go to state 73
+    IDENT   shift, and go to state 74
+    INTLIT  shift, and go to state 75
+
+    ArithExpression  go to state 117
+    ArithTherm       go to state 78
+    ArithFactor      go to state 79
+    Variable         go to state 80
+
+
+State 98
+
+   51 LogicalExpression: ArithExpression LE . ArithExpression
+
+    LPAREN  shift, and go to state 72
+    MINUS   shift, and go to state 73
+    IDENT   shift, and go to state 74
+    INTLIT  shift, and go to state 75
+
+    ArithExpression  go to state 118
+    ArithTherm       go to state 78
+    ArithFactor      go to state 79
+    Variable         go to state 80
+
+
+State 99
+
+   52 LogicalExpression: ArithExpression GT . ArithExpression
+
+    LPAREN  shift, and go to state 72
+    MINUS   shift, and go to state 73
+    IDENT   shift, and go to state 74
+    INTLIT  shift, and go to state 75
+
+    ArithExpression  go to state 119
+    ArithTherm       go to state 78
+    ArithFactor      go to state 79
+    Variable         go to state 80
+
+
+State 100
+
+   53 LogicalExpression: ArithExpression GE . ArithExpression
+
+    LPAREN  shift, and go to state 72
+    MINUS   shift, and go to state 73
+    IDENT   shift, and go to state 74
+    INTLIT  shift, and go to state 75
+
+    ArithExpression  go to state 120
+    ArithTherm       go to state 78
+    ArithFactor      go to state 79
+    Variable         go to state 80
+
+
+State 101
+
+   55 ArithExpression: ArithExpression PLUS . ArithTherm
+
+    LPAREN  shift, and go to state 72
+    MINUS   shift, and go to state 73
+    IDENT   shift, and go to state 74
+    INTLIT  shift, and go to state 75
+
+    ArithTherm   go to state 121
+    ArithFactor  go to state 79
+    Variable     go to state 80
+
+
+State 102
+
+   56 ArithExpression: ArithExpression MINUS . ArithTherm
+
+    LPAREN  shift, and go to state 72
+    MINUS   shift, and go to state 73
+    IDENT   shift, and go to state 74
+    INTLIT  shift, and go to state 75
+
+    ArithTherm   go to state 122
+    ArithFactor  go to state 79
+    Variable     go to state 80
+
+
+State 103
+
+   58 ArithTherm: ArithTherm STAR . ArithFactor
+
+    LPAREN  shift, and go to state 72
+    MINUS   shift, and go to state 73
+    IDENT   shift, and go to state 74
+    INTLIT  shift, and go to state 75
+
+    ArithFactor  go to state 123
+    Variable     go to state 80
+
+
+State 104
+
+   59 ArithTherm: ArithTherm SLASH . ArithFactor
+
+    LPAREN  shift, and go to state 72
+    MINUS   shift, and go to state 73
+    IDENT   shift, and go to state 74
+    INTLIT  shift, and go to state 75
+
+    ArithFactor  go to state 124
+    Variable     go to state 80
+
+
+State 105
+
+   23 VariableDecl: VAR IDENT COLON VariableDeclContent . SEMIC
+
+    SEMIC  shift, and go to state 125
+
+
+State 106
+
+   43 WhileStatement: WHILE LPAREN LogicalExpression RPAREN . Statement
+
+    IF     shift, and go to state 36
+    WHILE  shift, and go to state 38
+    LCURL  shift, and go to state 39
+    SEMIC  shift, and go to state 41
+    IDENT  shift, and go to state 42
+
+    Statement         go to state 126
+    IfElseStatement   go to state 47
+    IfElseBalanced    go to state 48
+    IfElseUnBalanced  go to state 49
+    BlockStatement    go to state 50
+    EmptyStatement    go to state 51
+    AssignStatement   go to state 52
+    WhileStatement    go to state 53
+    PocCallStatement  go to state 54
+    Variable          go to state 55
+
+
+State 107
+
+   44 PocCallStatement: IDENT LPAREN RPAREN SEMIC .
+
+    $default  reduce using rule 44 (PocCallStatement)
+
+
+State 108
+
+   45 PocCallStatement: IDENT LPAREN PocCallParamList RPAREN . SEMIC
+
+    SEMIC  shift, and go to state 127
+
+
+State 109
+
+   47 PocCallParamList: ArithExpression COMMA . PocCallParamList
+
+    LPAREN  shift, and go to state 72
+    MINUS   shift, and go to state 73
+    IDENT   shift, and go to state 74
+    INTLIT  shift, and go to state 75
+
+    PocCallParamList  go to state 128
+    ArithExpression   go to state 86
+    ArithTherm        go to state 78
+    ArithFactor       go to state 79
+    Variable          go to state 80
+
+
+State 110
+
+   66 Variable: Variable LBRACK ArithExpression RBRACK .
+
+    $default  reduce using rule 66 (Variable)
+
+
+State 111
+
+   42 AssignStatement: Variable ASGN LogicalExpression SEMIC .
+
+    $default  reduce using rule 42 (AssignStatement)
+
+
+State 112
+
+   64 ArithFactor: LPAREN ArithExpression RPAREN .
+
+    $default  reduce using rule 64 (ArithFactor)
+
+
+State 113
+
+   37 IfElseUnBalanced: IF LPAREN LogicalExpression RPAREN Statement .
+
+    $default  reduce using rule 37 (IfElseUnBalanced)
+
+
+State 114
+
+   30 IfElseStatement: IfElseBalanced .
+   36 IfElseBalanced: IF LPAREN LogicalExpression RPAREN IfElseBalanced . ELSE IfElseBalanced
+   38 IfElseUnBalanced: IF LPAREN LogicalExpression RPAREN IfElseBalanced . ELSE IfElseUnBalanced
+
+    ELSE  shift, and go to state 129
+
+    $default  reduce using rule 30 (IfElseStatement)
+
+
+State 115
+
+   48 LogicalExpression: ArithExpression EQ ArithExpression .
+   55 ArithExpression: ArithExpression . PLUS ArithTherm
+   56                | ArithExpression . MINUS ArithTherm
+
+    PLUS   shift, and go to state 101
+    MINUS  shift, and go to state 102
+
+    $default  reduce using rule 48 (LogicalExpression)
+
+
+State 116
+
+   49 LogicalExpression: ArithExpression NE ArithExpression .
+   55 ArithExpression: ArithExpression . PLUS ArithTherm
+   56                | ArithExpression . MINUS ArithTherm
+
+    PLUS   shift, and go to state 101
+    MINUS  shift, and go to state 102
+
+    $default  reduce using rule 49 (LogicalExpression)
+
+
+State 117
+
+   50 LogicalExpression: ArithExpression LT ArithExpression .
+   55 ArithExpression: ArithExpression . PLUS ArithTherm
+   56                | ArithExpression . MINUS ArithTherm
+
+    PLUS   shift, and go to state 101
+    MINUS  shift, and go to state 102
+
+    $default  reduce using rule 50 (LogicalExpression)
+
+
+State 118
+
+   51 LogicalExpression: ArithExpression LE ArithExpression .
+   55 ArithExpression: ArithExpression . PLUS ArithTherm
+   56                | ArithExpression . MINUS ArithTherm
+
+    PLUS   shift, and go to state 101
+    MINUS  shift, and go to state 102
+
+    $default  reduce using rule 51 (LogicalExpression)
+
+
+State 119
+
+   52 LogicalExpression: ArithExpression GT ArithExpression .
+   55 ArithExpression: ArithExpression . PLUS ArithTherm
+   56                | ArithExpression . MINUS ArithTherm
+
+    PLUS   shift, and go to state 101
+    MINUS  shift, and go to state 102
+
+    $default  reduce using rule 52 (LogicalExpression)
+
+
+State 120
+
+   53 LogicalExpression: ArithExpression GE ArithExpression .
+   55 ArithExpression: ArithExpression . PLUS ArithTherm
+   56                | ArithExpression . MINUS ArithTherm
+
+    PLUS   shift, and go to state 101
+    MINUS  shift, and go to state 102
+
+    $default  reduce using rule 53 (LogicalExpression)
+
+
+State 121
+
+   55 ArithExpression: ArithExpression PLUS ArithTherm .
+   58 ArithTherm: ArithTherm . STAR ArithFactor
+   59           | ArithTherm . SLASH ArithFactor
+
+    STAR   shift, and go to state 103
+    SLASH  shift, and go to state 104
+
+    $default  reduce using rule 55 (ArithExpression)
+
+
+State 122
+
+   56 ArithExpression: ArithExpression MINUS ArithTherm .
+   58 ArithTherm: ArithTherm . STAR ArithFactor
+   59           | ArithTherm . SLASH ArithFactor
+
+    STAR   shift, and go to state 103
+    SLASH  shift, and go to state 104
+
+    $default  reduce using rule 56 (ArithExpression)
+
+
+State 123
+
+   58 ArithTherm: ArithTherm STAR ArithFactor .
+
+    $default  reduce using rule 58 (ArithTherm)
+
+
+State 124
+
+   59 ArithTherm: ArithTherm SLASH ArithFactor .
+
+    $default  reduce using rule 59 (ArithTherm)
+
+
+State 125
+
+   23 VariableDecl: VAR IDENT COLON VariableDeclContent SEMIC .
+
+    $default  reduce using rule 23 (VariableDecl)
+
+
+State 126
+
+   43 WhileStatement: WHILE LPAREN LogicalExpression RPAREN Statement .
+
+    $default  reduce using rule 43 (WhileStatement)
+
+
+State 127
+
+   45 PocCallStatement: IDENT LPAREN PocCallParamList RPAREN SEMIC .
+
+    $default  reduce using rule 45 (PocCallStatement)
+
+
+State 128
+
+   47 PocCallParamList: ArithExpression COMMA PocCallParamList .
+
+    $default  reduce using rule 47 (PocCallParamList)
+
+
+State 129
+
+   36 IfElseBalanced: IF LPAREN LogicalExpression RPAREN IfElseBalanced ELSE . IfElseBalanced
+   38 IfElseUnBalanced: IF LPAREN LogicalExpression RPAREN IfElseBalanced ELSE . IfElseUnBalanced
+
+    IF     shift, and go to state 36
+    LCURL  shift, and go to state 39
+    SEMIC  shift, and go to state 41
+    IDENT  shift, and go to state 42
+
+    IfElseBalanced    go to state 130
+    IfElseUnBalanced  go to state 131
+    BlockStatement    go to state 50
+    EmptyStatement    go to state 51
+    AssignStatement   go to state 52
+    PocCallStatement  go to state 54
+    Variable          go to state 55
+
+
+State 130
+
+   36 IfElseBalanced: IF LPAREN LogicalExpression RPAREN IfElseBalanced ELSE IfElseBalanced .
+
+    $default  reduce using rule 36 (IfElseBalanced)
+
+
+State 131
+
+   38 IfElseUnBalanced: IF LPAREN LogicalExpression RPAREN IfElseBalanced ELSE IfElseUnBalanced .
+
+    $default  reduce using rule 38 (IfElseUnBalanced)

@@ -1,0 +1,5 @@
+type vector  = array[9] of int;
+proc main() {
+	var i : array[9] of array[9] of array[9] of vector;
+       i[9][i[9][9][9][9]][i[9][9][9][9]][i[9][9][9][9][9]] := i[9][i[9][9][9][9]][i[9][9][9][i[9][9][9][9]]][9];
+}
